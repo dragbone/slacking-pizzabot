@@ -1,0 +1,38 @@
+group 'pizzaslackbot'
+version 'alpha'
+
+buildscript {
+    ext.kotlin_version = '1.0.3'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+sourceCompatibility = 1.5
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile "com.ullink.slack:simpleslackapi:0.6.0"
+}
+
+mainClassName = "com.dragbone.pizzabot.RunnerKt"
+
+jar {
+    manifest {
+        attributes 'Main-Class': "$mainClassName"
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
