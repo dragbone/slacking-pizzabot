@@ -31,13 +31,13 @@ fun waitForBetterTimes(check: () -> Boolean) {
 
 class BotSession : IDisposeable {
     val session: SlackSession
-    val bot: PizzaBot
+    val bot: SlackBot
 
     constructor(botToken: String, channel: String) {
         session = SlackSessionFactory.createWebSocketSlackSession(botToken)
         session.connect()
 
-        bot = PizzaBot(channel)
+        bot = SlackBot(channel, VoteCommand(), PizzaCommand())
         session.addMessagePostedListener(bot)
     }
 

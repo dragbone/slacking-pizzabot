@@ -6,9 +6,6 @@ import org.junit.Assert.*
 import java.text.ParseException
 import java.time.DayOfWeek
 
-/**
- * Created by dragbone on 14.09.2016.
- */
 class PizzaVoteParserTest {
     @Test fun mapDay() {
         val parser = PizzaVoteParser()
@@ -93,5 +90,4 @@ class PizzaVoteParserTest {
         val parser = PizzaVoteParser()
         parser.parsePizzaVote("mo-wed,di")
     }
-
 }

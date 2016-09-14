@@ -4,13 +4,19 @@ import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener
 
-class PizzaBot(val channelName: String) : SlackMessagePostedListener {
+class SlackBot : SlackMessagePostedListener {
     val commandIndicator = "!"
+    val channelName: String
+    val commandMap: Map<String, ICommand>
 
-    val commandMap: Map<String, Command> = mapOf(
-            "pizza" to PizzaCommand(),
-            "vote" to VoteCommand()
-    )
+    constructor(channelName: String, vararg commands: ICommand) {
+        this.channelName = channelName
+        commandMap = commands.associateBy { it.name }
+        if (commandMap.count() != commands.count()) {
+            val duplicates = commands.groupBy { it.name }.filter { it.value.count() > 1 }.keys.joinToString()
+            throw IllegalArgumentException("Commands with identical names added: $duplicates")
+        }
+    }
 
     override fun onEvent(event: SlackMessagePosted, session: SlackSession) {
         val messageContent = event.messageContent

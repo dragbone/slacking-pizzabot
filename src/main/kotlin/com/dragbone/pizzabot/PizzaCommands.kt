@@ -3,13 +3,15 @@ package com.dragbone.pizzabot
 import com.ullink.slack.simpleslackapi.SlackChannel
 import com.ullink.slack.simpleslackapi.SlackUser
 
-class PizzaCommand : Command {
+class PizzaCommand : ICommand {
+    override val name: String = "pizza"
     override fun process(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
         return listOf("hi ${sender.userName}")
     }
 }
 
-class VoteCommand : Command {
+class VoteCommand : ICommand {
+    override val name: String = "vote"
     override fun process(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
         val votes = PizzaVoteParser().parsePizzaVote(args)
         return listOf("Thank you for your vote ${sender.userName}.", "You voted for ${votes.joinToString(", ") { it.day.toString() }}")
