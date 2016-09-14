@@ -37,8 +37,13 @@ class BotSession : IDisposeable {
         session = SlackSessionFactory.createWebSocketSlackSession(botToken)
         session.connect()
 
-        bot = SlackBot(channel, VoteCommand(), PizzaCommand())
+        bot = SlackBot(channel, *commands())
         session.addMessagePostedListener(bot)
+    }
+
+    private fun commands(): Array<ICommand> {
+        val pizzaState = PizzaVoteState()
+        return arrayOf(VoteCommand(pizzaState), PizzaCommand(pizzaState))
     }
 
     override fun dispose() {
