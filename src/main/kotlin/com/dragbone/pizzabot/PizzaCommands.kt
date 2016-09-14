@@ -3,9 +3,6 @@ package com.dragbone.pizzabot
 import com.ullink.slack.simpleslackapi.SlackChannel
 import com.ullink.slack.simpleslackapi.SlackUser
 
-/**
- * Created by dragbone on 13.09.2016.
- */
 class PizzaCommand : Command {
     override fun process(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
         return listOf("hi ${sender.userName}")

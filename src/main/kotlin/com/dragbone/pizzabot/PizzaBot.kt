@@ -4,9 +4,6 @@ import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener
 
-/**
- * Created by dragbone on 13.09.2016.
- */
 class PizzaBot(val channelName: String) : SlackMessagePostedListener {
     val commandIndicator = "!"
 
@@ -20,7 +17,7 @@ class PizzaBot(val channelName: String) : SlackMessagePostedListener {
         val channel = event.channel
         val sender = event.sender
         if (messageContent.length == 0 || sender.isBot || !channelName.equals(channel.name))
-            return;
+            return
 
         val firstWord = messageContent.substringBefore(' ')
 

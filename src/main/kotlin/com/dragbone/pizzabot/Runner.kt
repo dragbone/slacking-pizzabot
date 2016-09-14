@@ -4,11 +4,6 @@ import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory
 import kotlin.reflect.KFunction
 
-/**
- * Created by dragbone on 13.09.2016.
- */
-
-
 fun main(args: Array<String>) {
     if (args.count() < 2) {
         println("Usage: program <bot-api-token> <channel-name>")
@@ -28,16 +23,17 @@ fun waitForBetterTimes(check: () -> Boolean) {
     val something: Any = Any()
     synchronized(something) {
         while (check()) {
+            @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
             (something as java.lang.Object).wait()
         }
     }
 }
 
-class BotSession(val botToken: String, val channel: String) : IDisposeable {
+class BotSession : IDisposeable {
     val session: SlackSession
     val bot: PizzaBot
 
-    init {
+    constructor(botToken: String, channel: String) {
         session = SlackSessionFactory.createWebSocketSlackSession(botToken)
         session.connect()
 
