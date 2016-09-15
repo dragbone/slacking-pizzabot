@@ -1,7 +1,9 @@
 package com.dragbone.pizzabot
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory
+import java.io.File
 import kotlin.reflect.KFunction
 
 fun main(args: Array<String>) {
@@ -29,6 +31,8 @@ fun waitForBetterTimes(check: () -> Boolean) {
     }
 }
 
+val stateFile = "pizzastate.json"
+
 class BotSession : IDisposeable {
     val session: SlackSession
     val bot: SlackBot
@@ -42,7 +46,8 @@ class BotSession : IDisposeable {
     }
 
     private fun commands(): Array<ICommand> {
-        val pizzaState = PizzaVoteState()
+        val file = File(stateFile)
+        val pizzaState = if (file.exists()) jacksonObjectMapper().readValue(file, PizzaVoteState::class.java) else PizzaVoteState()
         return arrayOf(VoteCommand(pizzaState), PizzaCommand(pizzaState))
     }
 
