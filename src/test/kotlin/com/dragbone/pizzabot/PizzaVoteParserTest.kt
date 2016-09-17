@@ -4,7 +4,6 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import java.text.ParseException
-import java.time.DayOfWeek
 
 class PizzaVoteParserTest {
     @Test fun mapDay() {
@@ -35,18 +34,17 @@ class PizzaVoteParserTest {
     }
 
     @Test fun getNoneList() {
-        val parser = PizzaVoteParser()
-        assertTrue(parser.noneList.contains("none"))
-        assertTrue(parser.noneList.contains("nada"))
-        assertTrue(parser.noneList.contains("never"))
-        assertTrue(parser.noneList.contains("{}"))
-        assertTrue(parser.noneList.contains("[]"))
+        assertTrue(PizzaVoteParser.noneList.contains("none"))
+        assertTrue(PizzaVoteParser.noneList.contains("nada"))
+        assertTrue(PizzaVoteParser.noneList.contains("never"))
+        assertTrue(PizzaVoteParser.noneList.contains("{}"))
+        assertTrue(PizzaVoteParser.noneList.contains("[]"))
 
-        assertFalse(parser.noneList.contains("mo"))
-        assertFalse(parser.noneList.contains("di"))
-        assertFalse(parser.noneList.contains("mi"))
-        assertFalse(parser.noneList.contains("do"))
-        assertFalse(parser.noneList.contains("fr"))
+        assertFalse(PizzaVoteParser.noneList.contains("mo"))
+        assertFalse(PizzaVoteParser.noneList.contains("di"))
+        assertFalse(PizzaVoteParser.noneList.contains("mi"))
+        assertFalse(PizzaVoteParser.noneList.contains("do"))
+        assertFalse(PizzaVoteParser.noneList.contains("fr"))
     }
 
     @Test fun parsePizzaVote() {

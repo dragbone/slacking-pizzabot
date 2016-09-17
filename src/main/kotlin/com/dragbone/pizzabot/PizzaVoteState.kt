@@ -3,7 +3,6 @@ package com.dragbone.pizzabot
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.io.File
-import java.time.DayOfWeek
 import java.util.*
 
 class PizzaVoteState {

@@ -21,7 +21,7 @@ class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
         val votes = PizzaVoteParser().parsePizzaVote(args)
         pizzaState.vote(sender.id, votes)
 
-        // save state
+        // Save state
         jacksonObjectMapper().writeValue(File("pizzastate.json"), pizzaState)
 
         return listOf(

@@ -22,6 +22,7 @@ class SlackBot : SlackMessagePostedListener {
         val messageContent = event.messageContent
         val channel = event.channel
         val sender = event.sender
+        println("Received message in channel ${channel.name}, filtering for $channelName")
         if (messageContent.length == 0 || sender.isBot || !channelName.equals(channel.name))
             return
 
@@ -31,13 +32,20 @@ class SlackBot : SlackMessagePostedListener {
         if (firstWord.startsWith(commandIndicator)) {
             // Find command
             val commandName = firstWord.removePrefix(commandIndicator)
-            val command = commandMap[commandName]!!
+            println("Command: $commandName")
+            try {
+                val command = commandMap[commandName]!!
 
-            // Execute
-            val messages = command.process(messageContent.substringAfter(' '), channel, sender)
+                // Execute
+                val messages = command.process(messageContent.substringAfter(' '), channel, sender)
 
-            // Send messages
-            messages.forEach { session.sendMessage(channel, it) }
+                println("Going to send message $messages")
+
+                // Send messages
+                messages.forEach { session.sendMessage(channel, it) }
+            } catch (e: Exception) {
+                println("Exception while executing command $commandName: $e")
+            }
         }
     }
 }
