@@ -11,7 +11,7 @@ class PizzaDayChooser(val pizzaVoteState: PizzaVoteState) {
         val possibleDays = dayAvailability.filter { it.value >= bestAvailability }.map { it.key }
 
         var recommendedDay = pizzaVoteState.currentRecommendedDay
-        if (recommendedDay == null || !possibleDays.contains(recommendedDay)) {
+        if (!possibleDays.contains(recommendedDay)) {
             recommendedDay = possibleDays.sortedByDescending { dayRanking[it] }.first()
         }
         pizzaVoteState.currentRecommendedDay = recommendedDay

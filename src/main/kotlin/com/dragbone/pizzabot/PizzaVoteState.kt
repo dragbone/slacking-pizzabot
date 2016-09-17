@@ -1,8 +1,5 @@
 package com.dragbone.pizzabot
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import java.io.File
 import java.util.*
 
 class PizzaVoteState {
@@ -16,7 +13,7 @@ class PizzaVoteState {
         pizzaVotes = votes
     }
 
-    var currentRecommendedDay: DayOfWeek? = null
+    var currentRecommendedDay: DayOfWeek = DayOfWeek.WEDNESDAY
 
     fun getPizzaVotes(): Map<String, List<Vote>> = pizzaVotes
 
