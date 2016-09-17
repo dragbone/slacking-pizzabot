@@ -47,3 +47,13 @@ class ResetCommand(val pizzaState: PizzaVoteState) : ICommand {
         return emptyList()
     }
 }
+
+class InfoCommand(val pizzaState: PizzaVoteState) : ICommand {
+    override val name = "info"
+    override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
+        return listOf(
+                "I'm a slack bot and I love pizza!",
+                "You can find my code on https://github.com/dragbone/slacking-pizzabot"
+        )
+    }
+}
