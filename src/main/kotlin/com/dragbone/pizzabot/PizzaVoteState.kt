@@ -16,6 +16,8 @@ class PizzaVoteState {
         pizzaVotes = votes
     }
 
+    var currentRecommendedDay: DayOfWeek? = null
+
     fun getPizzaVotes(): Map<String, List<Vote>> = pizzaVotes
 
     fun summedVotesByDay(): Map<DayOfWeek, Double> = pizzaVotes.values
