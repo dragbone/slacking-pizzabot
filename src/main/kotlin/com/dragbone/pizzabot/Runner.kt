@@ -41,14 +41,18 @@ class BotSession : IDisposeable {
         session = SlackSessionFactory.createWebSocketSlackSession(botToken)
         session.connect()
 
-        bot = SlackBot(channel, *commands())
+        bot = SlackBot(channel, commands())
         session.addMessagePostedListener(bot)
     }
 
-    private fun commands(): Array<ICommand> {
+    private fun commands(): List<ICommand> {
         val file = File(stateFile)
         val pizzaState = if (file.exists()) jacksonObjectMapper().readValue(file, PizzaVoteState::class.java) else PizzaVoteState()
-        return arrayOf(VoteCommand(pizzaState), PizzaCommand(pizzaState))
+        return listOf(
+                VoteCommand(pizzaState),
+                PizzaCommand(pizzaState),
+                ResetCommand(pizzaState)
+        )
     }
 
     override fun dispose() {

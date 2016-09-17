@@ -5,5 +5,5 @@ import com.ullink.slack.simpleslackapi.SlackUser
 
 interface ICommand {
     val name: String
-    fun process(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String>
+    fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String>
 }

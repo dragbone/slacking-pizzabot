@@ -8,8 +8,8 @@ import java.util.*
 
 class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
     val pizzaDayChooser = PizzaDayChooser(pizzaState)
-    override val name: String = "pizza"
-    override fun process(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
+    override val name = "pizza"
+    override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
         val aggregatedVotes = pizzaState.summedVotesByDay()
         val formattedVotes = aggregatedVotes.entries.joinToString { "${it.key.toPrettyString()}=${it.value}" }
         return listOf(
@@ -20,8 +20,8 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
 }
 
 class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
-    override val name: String = "vote"
-    override fun process(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
+    override val name = "vote"
+    override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
         val votes = PizzaVoteParser().parsePizzaVote(args)
         pizzaState.vote(sender.id, votes)
 
@@ -34,8 +34,16 @@ class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
         )
 
         if (pizzaState.getPizzaVotes().count() >= 3) {
-            return messages.union(PizzaCommand(pizzaState).process("", channel, sender))
+            return messages.union(PizzaCommand(pizzaState).execute("", channel, sender))
         }
         return messages
+    }
+}
+
+class ResetCommand(val pizzaState: PizzaVoteState) : ICommand {
+    override val name = "clear"
+    override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
+        pizzaState.resetVotes()
+        return emptyList()
     }
 }

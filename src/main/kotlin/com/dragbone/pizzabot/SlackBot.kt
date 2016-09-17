@@ -9,7 +9,7 @@ class SlackBot : SlackMessagePostedListener {
     val channelName: String
     val commandMap: Map<String, ICommand>
 
-    constructor(channelName: String, vararg commands: ICommand) {
+    constructor(channelName: String, commands: Iterable<ICommand>) {
         this.channelName = channelName
         commandMap = commands.associateBy { it.name }
         if (commandMap.count() != commands.count()) {
@@ -37,7 +37,7 @@ class SlackBot : SlackMessagePostedListener {
                 val command = commandMap[commandName]!!
 
                 // Execute
-                val messages = command.process(messageContent.substringAfter(' '), channel, sender)
+                val messages = command.execute(messageContent.substringAfter(' '), channel, sender)
 
                 println("Going to send message $messages")
 
