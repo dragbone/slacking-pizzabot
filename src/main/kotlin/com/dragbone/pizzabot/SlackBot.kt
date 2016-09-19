@@ -33,19 +33,26 @@ class SlackBot : SlackMessagePostedListener {
             // Find command
             val commandName = firstWord.removePrefix(commandIndicator)
             println("Command: $commandName")
+
+
             try {
+                if (!commandMap.containsKey(commandName))
+                    throw CommandNotFoundException(commandName)
                 val command = commandMap[commandName]!!
 
                 // Execute
                 val messages = command.execute(messageContent.substringAfter(' '), channel, sender)
 
-                println("Going to send message $messages")
+                println("Going to send messages: $messages")
 
                 // Send messages
                 messages.forEach { session.sendMessage(channel, it) }
             } catch (e: Exception) {
                 println("Exception while executing command $commandName: $e")
+                e.printStackTrace()
             }
         }
     }
 }
+
+class CommandNotFoundException(commandName: String) : Exception("Could not find command '$commandName'.")
