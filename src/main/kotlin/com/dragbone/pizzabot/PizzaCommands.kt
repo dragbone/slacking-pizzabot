@@ -12,9 +12,14 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
         val aggregatedVotes = pizzaState.summedVotesByDay()
         val formattedVotes = aggregatedVotes.entries.joinToString { "${it.key.toPrettyString()}=${it.value}" }
+        val pizzaDay = pizzaDayChooser.choosePizzaDay(aggregatedVotes)
+
+        // Save state
+        jacksonObjectMapper().writeValue(File("pizzastate.json"), pizzaState)
+
         return listOf(
                 "Summed votes: $formattedVotes",
-                "You should eat pizza on ${pizzaDayChooser.choosePizzaDay(aggregatedVotes).toPrettyString()}."
+                "You should eat pizza on ${pizzaDay.toPrettyString()}."
         )
     }
 }
@@ -25,9 +30,6 @@ class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
         val votes = PizzaVoteParser().parsePizzaVote(args)
         pizzaState.vote(sender.id, votes)
 
-        // Save state
-        jacksonObjectMapper().writeValue(File("pizzastate.json"), pizzaState)
-
         val messages = listOf(
                 "Thank you for your vote ${sender.userName}.",
                 "You voted for ${votes.joinToString(", ") { it.day.toPrettyString() }}."
@@ -36,6 +38,10 @@ class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
         if (pizzaState.getPizzaVotes().count() >= 3) {
             return messages.union(PizzaCommand(pizzaState).execute("", channel, sender))
         }
+
+        // Save state
+        jacksonObjectMapper().writeValue(File("pizzastate.json"), pizzaState)
+
         return messages
     }
 }
@@ -48,7 +54,7 @@ class ResetCommand(val pizzaState: PizzaVoteState) : ICommand {
     }
 }
 
-class InfoCommand(val pizzaState: PizzaVoteState) : ICommand {
+class InfoCommand() : ICommand {
     override val name = "info"
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
         return listOf(

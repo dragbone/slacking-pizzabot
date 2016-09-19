@@ -51,7 +51,8 @@ class BotSession : IDisposeable {
         return listOf(
                 VoteCommand(pizzaState),
                 PizzaCommand(pizzaState),
-                ResetCommand(pizzaState)
+                ResetCommand(pizzaState),
+                InfoCommand()
         )
     }
 

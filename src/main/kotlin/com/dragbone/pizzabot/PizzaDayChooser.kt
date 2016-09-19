@@ -2,7 +2,7 @@ package com.dragbone.pizzabot
 
 import java.util.*
 
-class PizzaDayChooser(val pizzaVoteState: PizzaVoteState) {
+class PizzaDayChooser(private val pizzaVoteState: PizzaVoteState) {
     fun choosePizzaDay(dayAvailability: Map<DayOfWeek, Double>): DayOfWeek {
         val rnd = Random(Calendar.getInstance().get(Calendar.DAY_OF_YEAR).toLong())
         val days = mutableListOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
