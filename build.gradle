@@ -2,7 +2,7 @@ group 'pizzaslackbot'
 version 'alpha'
 
 buildscript {
-    ext.kotlin_version = '1.0.3'
+    ext.kotlin_version = '1.0.4'
 
     repositories {
         mavenCentral()

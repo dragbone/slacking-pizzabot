@@ -1,5 +1,8 @@
 package com.dragbone.pizzabot
 
+import com.dragbone.IDisposeable
+import com.dragbone.slackbot.ICommand
+import com.dragbone.slackbot.SlackBot
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory

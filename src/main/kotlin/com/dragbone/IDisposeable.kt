@@ -1,4 +1,4 @@
-package com.dragbone.pizzabot
+package com.dragbone
 
 
 interface IDisposeable {
