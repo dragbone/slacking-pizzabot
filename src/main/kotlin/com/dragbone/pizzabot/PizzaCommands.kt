@@ -12,16 +12,20 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
     override val name = "pizza"
     override val requiresAdmin = false
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
-        val aggregatedVotes = pizzaState.summedVotesByDay()
-        val formattedVotes = aggregatedVotes.entries.joinToString { "${it.key.toPrettyString()}=${it.value}" }
-        val pizzaDay = pizzaDayChooser.choosePizzaDay(aggregatedVotes)
+        if(!pizzaState.hasVotes())
+            return listOf("No votes for any day yet.")
 
+        val aggregatedVotes = pizzaState.summedVotesByDay()
+        val pizzaDay = pizzaDayChooser.choosePizzaDay(aggregatedVotes)
         // Save state
         jacksonObjectMapper().writeValue(File("pizzastate.json"), pizzaState)
 
+        val votesOnDay = pizzaState.votesByDay()[pizzaDay]!!;
+        val userMap = channel.members.associateBy { it.id }
+        val participants = votesOnDay.map { userMap[it.user]!!.userName }.joinToString()
         return listOf(
-                "Summed votes: $formattedVotes",
-                "You should eat pizza on ${pizzaDay.toPrettyString()}."
+                "You should eat pizza on ${pizzaDay.toPrettyString()}.",
+                "Participants: $participants"
         )
     }
 }
@@ -35,7 +39,7 @@ class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
 
         val messages = listOf(
                 "Thank you for your vote ${sender.userName}.",
-                "You voted for ${votes.joinToString(", ") { it.day.toPrettyString() }}."
+                "You voted for {${votes.joinToString() { it.day.toPrettyString() }}}."
         )
 
         if (pizzaState.getPizzaVotes().count() >= 3) {

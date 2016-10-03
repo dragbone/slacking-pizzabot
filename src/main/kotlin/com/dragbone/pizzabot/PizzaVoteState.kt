@@ -22,11 +22,20 @@ class PizzaVoteState {
             .groupBy { it.day }
             .mapValues { it.value.sumByDouble { it.strength.toDouble() } }
 
+    fun votesByDay(): Map<DayOfWeek, List<NamedVote>> = pizzaVotes.entries
+            .flatMap {
+                it.run {
+                    value.map { NamedVote(key, it) }
+                }
+            }.groupBy { it.vote.day }
+
     fun vote(userId: String, votes: Set<Vote>) {
         val list = pizzaVotes.getOrPut(userId) { ArrayList() }
         list.clear()
         list.addAll(votes)
     }
+
+    fun hasVotes() = pizzaVotes.any { it.value.any() }
 
     fun resetVotes() {
         pizzaVotes.clear()
