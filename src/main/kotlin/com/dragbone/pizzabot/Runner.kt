@@ -7,6 +7,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.reflect.KFunction
 
 fun main(args: Array<String>) {
@@ -46,6 +48,9 @@ class BotSession : IDisposeable {
 
         bot = SlackBot(channel, commands())
         session.addMessagePostedListener(bot)
+
+        val ch = session.channels.single { it.name == channel }
+        session.sendMessage(ch, "I HAVE BEEN REBORN! (deployed on ${SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(Date())})")
     }
 
     private fun commands(): List<ICommand> {
