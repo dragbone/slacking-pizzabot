@@ -24,7 +24,10 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
 
         val votesOnDay = pizzaState.votesByDay()[pizzaDay]!!;
         val userMap = channel.members.associateBy { it.id }
-        val participants = votesOnDay.map { userMap[it.user]!!.userName }.joinToString()
+        val participants = votesOnDay.map {
+            val username = userMap[it.user]!!.userName
+            if (it.vote.strength == 1f) username else "($username)"
+        }.joinToString()
         return listOf(
                 "You should eat pizza on ${pizzaDay.toPrettyString()}.",
                 "Participants: $participants"
