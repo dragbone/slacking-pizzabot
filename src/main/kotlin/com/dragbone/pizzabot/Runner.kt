@@ -9,7 +9,6 @@ import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.reflect.KFunction
 
 fun main(args: Array<String>) {
     if (args.count() < 2) {
@@ -41,12 +40,16 @@ val stateFile = "pizzastate.json"
 class BotSession : IDisposeable {
     val session: SlackSession
     val bot: SlackBot
+    val pizzaState: PizzaVoteState
 
     constructor(botToken: String, channel: String) {
+        val file = File(stateFile)
+        pizzaState = if (file.exists()) jacksonObjectMapper().readValue(file, PizzaVoteState::class.java) else PizzaVoteState()
+
         session = SlackSessionFactory.createWebSocketSlackSession(botToken)
         session.connect()
 
-        bot = SlackBot(channel, commands())
+        bot = SlackBot(session, channel, commands(), listOf(RemindCronTask(pizzaState)))
         session.addMessagePostedListener(bot)
 
         val ch = session.channels.single { it.name == channel }
@@ -54,8 +57,6 @@ class BotSession : IDisposeable {
     }
 
     private fun commands(): List<ICommand> {
-        val file = File(stateFile)
-        val pizzaState = if (file.exists()) jacksonObjectMapper().readValue(file, PizzaVoteState::class.java) else PizzaVoteState()
         return listOf(
                 VoteCommand(pizzaState),
                 PizzaCommand(pizzaState),

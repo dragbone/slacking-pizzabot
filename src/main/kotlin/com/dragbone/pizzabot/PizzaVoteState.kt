@@ -14,12 +14,13 @@ class PizzaVoteState {
     }
 
     var currentRecommendedDay: DayOfWeek = DayOfWeek.WEDNESDAY
+    var reminderTriggered = false
 
     fun getPizzaVotes(): Map<String, List<Vote>> = pizzaVotes
 
     fun summedVotesByDay(): Map<DayOfWeek, Double> = pizzaVotes.values
             .flatten()
-            .groupBy { it.day }
+            .groupBy(Vote::day)
             .mapValues { it.value.sumByDouble { it.strength.toDouble() } }
 
     fun votesByDay(): Map<DayOfWeek, List<NamedVote>> = pizzaVotes.entries
@@ -30,9 +31,10 @@ class PizzaVoteState {
             }.groupBy { it.vote.day }
 
     fun vote(userId: String, votes: Set<Vote>) {
-        val list = pizzaVotes.getOrPut(userId) { ArrayList() }
-        list.clear()
-        list.addAll(votes)
+        with(pizzaVotes.getOrPut(userId) { ArrayList() }) {
+            clear()
+            addAll(votes)
+        }
     }
 
     fun hasVotes() = pizzaVotes.any { it.value.any() }

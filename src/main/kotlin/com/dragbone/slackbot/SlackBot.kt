@@ -1,11 +1,10 @@
 package com.dragbone.slackbot
 
-import com.dragbone.slackbot.ICommand
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener
-import java.io.File
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class SlackBot : SlackMessagePostedListener {
     val commandIndicator = "!"
@@ -14,16 +13,29 @@ class SlackBot : SlackMessagePostedListener {
     val botState: BotState
     val stateName: String
 
-    constructor(channelName: String, commands: Iterable<ICommand>) {
+    private val cronCommands: Iterable<ICronTask>
+    private val session: SlackSession
+
+    constructor(session: SlackSession, channelName: String, commands: Iterable<ICommand>, cronCommands: Iterable<ICronTask>) {
+        this.session = session
         this.channelName = channelName
         commandMap = commands.associateBy { it.name }
         if (commandMap.count() != commands.count()) {
             val duplicates = commands.groupBy { it.name }.filter { it.value.count() > 1 }.keys.joinToString()
             throw IllegalArgumentException("Commands with identical names added: $duplicates")
         }
-
         stateName = "$channelName.bot.json"
         botState = StateStore().getOrCreate(stateName) { BotState() }
+        this.cronCommands = cronCommands
+
+        val slackChannel = session.channels.single { it.name == channelName }
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
+            cronCommands
+                    .flatMap { it.run() }
+                    .forEach { session.sendMessage(slackChannel, it) }
+            // Save state after command execution
+            StateStore().save(stateName, botState)
+        }, 10, 60, TimeUnit.SECONDS)
     }
 
     override fun onEvent(event: SlackMessagePosted, session: SlackSession) {
@@ -31,7 +43,7 @@ class SlackBot : SlackMessagePostedListener {
         val channel = event.channel
         val sender = event.sender
         println("Received message in channel ${channel.name} from ${event.sender.id}, filtering for $channelName")
-        if (messageContent.length == 0 || sender.isBot || !channelName.equals(channel.name))
+        if (messageContent.length == 0 || sender.isBot || channelName != channel.name)
             return
 
         val firstWord = messageContent.substringBefore(' ')

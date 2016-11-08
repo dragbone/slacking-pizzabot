@@ -1,8 +1,10 @@
 package com.dragbone.pizzabot
 
 import com.dragbone.slackbot.ICommand
+import com.dragbone.slackbot.ICronTask
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ullink.slack.simpleslackapi.SlackChannel
+import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.SlackUser
 import java.io.File
 import java.util.*
@@ -12,7 +14,7 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
     override val name = "pizza"
     override val requiresAdmin = false
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
-        if(!pizzaState.hasVotes())
+        if (!pizzaState.hasVotes())
             return listOf("No votes for any day yet.")
 
         val aggregatedVotes = pizzaState.summedVotesByDay()
@@ -70,5 +72,18 @@ class InfoCommand() : ICommand {
                 "I'm a slack bot and I love pizza!",
                 "You can find my code on https://github.com/dragbone/slacking-pizzabot"
         )
+    }
+}
+
+class RemindCronTask(val pizzaState: PizzaVoteState) : ICronTask {
+    override fun run(): Iterable<String> {
+        if (pizzaState.reminderTriggered)
+            return emptyList()
+        val currentDay = DayOfWeek.current()
+        if (pizzaState.currentRecommendedDay == currentDay && Calendar.getInstance()[Calendar.HOUR_OF_DAY] >= 17) {
+            pizzaState.reminderTriggered = true
+            return listOf("Pizza reminder!", "Pizza scheduled for today.")
+        }
+        return emptyList()
     }
 }
