@@ -13,7 +13,7 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
     val pizzaDayChooser = PizzaDayChooser(pizzaState)
     override val name = "pizza"
     override val requiresAdmin = false
-    override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
+    override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
         if (!pizzaState.hasVotes())
             return listOf("No votes for any day yet.")
 
@@ -29,7 +29,7 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
             if (it.vote.strength == 1f) username else "($username)"
         }.joinToString()
         return listOf(
-                "You should eat pizza on ${pizzaDay.toPrettyString()}.",
+                "You should eat :pizza: on ${pizzaDay.toPrettyString()}.",
                 "Participants: $participants"
         )
     }
@@ -38,7 +38,8 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
 class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
     override val name = "vote"
     override val requiresAdmin = false
-    override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
+    override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
+        sender!!
         val votes = PizzaVoteParser().parsePizzaVote(args)
         pizzaState.vote(sender.id, votes)
 
@@ -61,7 +62,7 @@ class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
 class ResetCommand(val pizzaState: PizzaVoteState) : ICommand {
     override val name = "clear"
     override val requiresAdmin = true
-    override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
+    override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
         pizzaState.resetVotes()
         return listOf("Votes have been reset.")
     }
@@ -70,7 +71,7 @@ class ResetCommand(val pizzaState: PizzaVoteState) : ICommand {
 class InfoCommand() : ICommand {
     override val name = "info"
     override val requiresAdmin = false
-    override fun execute(args: String, channel: SlackChannel, sender: SlackUser): Iterable<String> {
+    override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
         return listOf(
                 "I'm a slack bot and I love pizza!",
                 "You can find my code on https://github.com/dragbone/slacking-pizzabot"
@@ -79,13 +80,13 @@ class InfoCommand() : ICommand {
 }
 
 class RemindCronTask(val pizzaState: PizzaVoteState) : ICronTask {
-    override fun run(): Iterable<String> {
+    override fun run(channel: SlackChannel): Iterable<String> {
         if (pizzaState.reminderTriggered)
             return emptyList()
         val currentDay = DayOfWeek.current()
         if (pizzaState.currentRecommendedDay == currentDay && Calendar.getInstance()[Calendar.HOUR_OF_DAY] >= 17) {
             pizzaState.reminderTriggered = true
-            return listOf("Pizza reminder!", "Pizza scheduled for today.")
+            return listOf("REMINDER!").union(PizzaCommand(pizzaState).execute("", channel, null))
         }
         return emptyList()
     }

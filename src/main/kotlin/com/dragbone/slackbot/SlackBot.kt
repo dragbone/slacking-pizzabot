@@ -31,7 +31,7 @@ class SlackBot : SlackMessagePostedListener {
         val slackChannel = session.channels.single { it.name == channelName }
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
             cronCommands
-                    .flatMap { it.run() }
+                    .flatMap { it.run(slackChannel) }
                     .forEach { session.sendMessage(slackChannel, it) }
             // Save state after command execution
             StateStore().save(stateName, botState)
