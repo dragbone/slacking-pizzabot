@@ -64,6 +64,7 @@ class ResetCommand(val pizzaState: PizzaVoteState) : ICommand {
     override val requiresAdmin = true
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
         pizzaState.resetVotes()
+        pizzaState.reminderTriggered = false
         return listOf("Votes have been reset.")
     }
 }
