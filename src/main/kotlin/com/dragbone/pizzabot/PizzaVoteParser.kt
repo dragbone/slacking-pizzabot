@@ -20,7 +20,7 @@ class PizzaVoteParser {
                 "fr" to DayOfWeek.FRIDAY
         )
 
-        val noneList: Set<String> = setOf("none", "null", "{}", "()", "[]", "nada", "never", ":-(", ":'-(")
+        val noneList: Set<String> = setOf("none", "null", "{}", "()", "[]", "nada", "never", "nope", ":-(", ":'-(")
     }
 
     fun mapToDay(day: String): DayOfWeek = dayMap[day.toLowerCase().substring(0, 2)]!!
