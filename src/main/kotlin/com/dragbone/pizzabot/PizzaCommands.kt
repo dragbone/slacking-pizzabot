@@ -48,7 +48,7 @@ class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
                 "You voted for {${votes.joinToString() { it.day.toPrettyString() }}}."
         )
 
-        if (pizzaState.getPizzaVotes().count() >= 3) {
+        if (pizzaState.summedVotesByDay().values.any { Math.ceil(it) >= 3 }) {
             return messages.union(PizzaCommand(pizzaState).execute("", channel, sender))
         }
 
