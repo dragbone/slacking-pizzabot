@@ -69,7 +69,7 @@ class SlackBot : SlackMessagePostedListener {
                 println("Going to send messages: $messages")
 
                 // Send messages
-                messages.forEach { session.sendMessage(channel, it) }
+                session.sendMessage(channel, messages.joinToString("\n"))
             } catch (e: Exception) {
                 println("Exception while executing command $commandName: $e")
                 e.printStackTrace()
