@@ -17,12 +17,9 @@ fun main(args: Array<String>) {
 
     val botSession = BotSession(args[0], args[1])
 
-    // TODO: this doesn't work :(
-    Runtime.getRuntime().addShutdownHook(Thread {
-        botSession.dispose()
-    })
+    ShutdownService().listen()
 
-    waitForBetterTimes { botSession.session.isConnected }
+    botSession.dispose()
 }
 
 fun waitForBetterTimes(check: () -> Boolean) {
@@ -66,6 +63,7 @@ class BotSession : IDisposeable {
     }
 
     override fun dispose() {
+        bot.dispose()
         session.removeMessagePostedListener(bot)
         session.disconnect()
     }

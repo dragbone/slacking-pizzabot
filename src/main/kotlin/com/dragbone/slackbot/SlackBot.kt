@@ -1,35 +1,35 @@
 package com.dragbone.slackbot
 
+import com.dragbone.IDisposeable
+import com.dragbone.choose
 import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
-class SlackBot : SlackMessagePostedListener {
+class SlackBot(private val session: SlackSession,
+               val channelName: String,
+               commands: Iterable<ICommand>,
+               private val cronCommands: Iterable<ICronTask>)
+    : SlackMessagePostedListener, IDisposeable {
+
     val commandIndicator = "!"
-    val channelName: String
-    val commandMap: Map<String, ICommand>
+    val commandMap: Map<String, ICommand> = commands.associateBy { it.name }
     val botState: BotState
-    val stateName: String
+    val stateName: String = "$channelName.bot.json"
+    val slackChannel = session.channels.single { it.name == channelName }!!
+    private val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
-    private val cronCommands: Iterable<ICronTask>
-    private val session: SlackSession
-
-    constructor(session: SlackSession, channelName: String, commands: Iterable<ICommand>, cronCommands: Iterable<ICronTask>) {
-        this.session = session
-        this.channelName = channelName
-        commandMap = commands.associateBy { it.name }
+    init {
         if (commandMap.count() != commands.count()) {
             val duplicates = commands.groupBy { it.name }.filter { it.value.count() > 1 }.keys.joinToString()
             throw IllegalArgumentException("Commands with identical names added: $duplicates")
         }
-        stateName = "$channelName.bot.json"
         botState = StateStore().getOrCreate(stateName) { BotState() }
-        this.cronCommands = cronCommands
 
-        val slackChannel = session.channels.single { it.name == channelName }
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
+        executor.scheduleAtFixedRate({
             cronCommands
                     .flatMap { it.run(slackChannel) }
                     .forEach { session.sendMessage(slackChannel, it) }
@@ -43,7 +43,7 @@ class SlackBot : SlackMessagePostedListener {
         val channel = event.channel
         val sender = event.sender
         println("Received message in channel ${channel.name} from ${event.sender.id}, filtering for $channelName")
-        if (messageContent.length == 0 || sender.isBot || channelName != channel.name)
+        if (messageContent.isEmpty() || sender.isBot || channelName != channel.name)
             return
 
         val firstWord = messageContent.substringBefore(' ')
@@ -78,6 +78,16 @@ class SlackBot : SlackMessagePostedListener {
             // Save state after command execution
             StateStore().save(stateName, botState)
         }
+    }
+
+    val shutdownMessages = listOf(
+            "Shutting down. Tell my :pizza: I love her...",
+            "Bye bye. It was nice knowing you.",
+            "I'm going to sleep now... pizZzZzZz...")
+
+    override fun dispose() {
+        session.sendMessage(slackChannel, shutdownMessages.choose())
+        executor.shutdown()
     }
 }
 
