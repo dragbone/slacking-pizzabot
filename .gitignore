@@ -4,7 +4,6 @@
 
 ### General
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -16,10 +15,6 @@ hs_err_pid*
 /build/
 /out/
 *.iws
-
-# Gradle:
-/gradle/
-/gradlew*
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
