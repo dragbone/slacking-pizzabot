@@ -13,7 +13,7 @@ class PizzaVoteState {
         pizzaVotes = votes
     }
 
-    var currentRecommendedDay: DayOfWeek = DayOfWeek.WEDNESDAY
+    var currentRecommendedDay: DayOfWeek? = null
     var reminderTriggered = false
 
     fun getPizzaVotes(): Map<String, List<Vote>> = pizzaVotes

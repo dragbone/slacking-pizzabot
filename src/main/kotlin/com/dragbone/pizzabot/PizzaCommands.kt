@@ -9,24 +9,27 @@ import com.ullink.slack.simpleslackapi.SlackUser
 import java.io.File
 import java.util.*
 
+fun saveState(pizzaState: PizzaVoteState) {
+    jacksonObjectMapper().writeValue(File("pizzastate.json"), pizzaState)
+}
+
 class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
     val pizzaDayChooser = PizzaDayChooser(pizzaState)
     override val name = "pizza"
     override val requiresAdmin = false
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
-        if (!pizzaState.hasVotes())
-            return listOf("No votes for any day yet.")
-
         val aggregatedVotes = pizzaState.summedVotesByDay()
         val pizzaDay = pizzaDayChooser.choosePizzaDay(aggregatedVotes)
-        // Save state
-        jacksonObjectMapper().writeValue(File("pizzastate.json"), pizzaState)
+        saveState(pizzaState)
 
-        val votesOnDay = pizzaState.votesByDay()[pizzaDay]!!;
+        if (pizzaDay == null)
+            return listOf("Not enough votes yet.")
+
+        val votesOnPizzaDay = pizzaState.votesByDay()[pizzaDay]!!
         val userMap = channel.members.associateBy { it.id }
-        val participants = votesOnDay.map {
-            val username = userMap[it.user]!!.userName
-            if (it.vote.strength == 1f) username else "($username)"
+        val participants = votesOnPizzaDay.map {
+            val username = userMap[it.user]?.userName ?: it.user
+            if (it.vote.strength >= 1f) username else "($username)"
         }.joinToString()
         return listOf(
                 "You should eat :pizza: on ${pizzaDay.toPrettyString()}.",
@@ -48,14 +51,9 @@ class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
                 "You voted for {${votes.joinToString() { it.day.toPrettyString() }}}."
         )
 
-        if (pizzaState.summedVotesByDay().values.any { Math.ceil(it) >= 3 }) {
-            return messages.union(PizzaCommand(pizzaState).execute("", channel, sender))
-        }
+        saveState(pizzaState)
 
-        // Save state
-        jacksonObjectMapper().writeValue(File("pizzastate.json"), pizzaState)
-
-        return messages
+        return messages.union(PizzaCommand(pizzaState).execute("", channel, sender))
     }
 }
 
@@ -64,12 +62,14 @@ class ResetCommand(val pizzaState: PizzaVoteState) : ICommand {
     override val requiresAdmin = true
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
         pizzaState.resetVotes()
+        pizzaState.currentRecommendedDay = null
         pizzaState.reminderTriggered = false
+        saveState(pizzaState)
         return listOf("Votes have been reset.")
     }
 }
 
-class InfoCommand() : ICommand {
+class InfoCommand : ICommand {
     override val name = "info"
     override val requiresAdmin = false
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
@@ -87,6 +87,7 @@ class RemindCronTask(val pizzaState: PizzaVoteState) : ICronTask {
         val currentDay = DayOfWeek.current()
         if (pizzaState.currentRecommendedDay == currentDay && Calendar.getInstance()[Calendar.HOUR_OF_DAY] >= 17) {
             pizzaState.reminderTriggered = true
+            saveState(pizzaState)
             return listOf("REMINDER!").union(PizzaCommand(pizzaState).execute("", channel, null))
         }
         return emptyList()

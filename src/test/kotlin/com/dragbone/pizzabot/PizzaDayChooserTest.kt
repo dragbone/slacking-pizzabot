@@ -25,7 +25,7 @@ class PizzaDayChooserTest(val cl: Class<PizzaDayChooser>) {
         val chooser = getPizzaDayChooser()
         val k = mapOf(
                 DayOfWeek.MONDAY to 1.0,
-                DayOfWeek.TUESDAY to 2.0,
+                DayOfWeek.TUESDAY to 2.5,
                 DayOfWeek.WEDNESDAY to 1.0
         )
 
