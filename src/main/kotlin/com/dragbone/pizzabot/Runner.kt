@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 fun main(args: Array<String>) {
+    // Deploy test
     if (args.count() < 2) {
         println("Usage: program <bot-api-token> <channel-name>")
     }
