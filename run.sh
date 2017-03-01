@@ -1,4 +1,4 @@
-curl localhost:1024/DEATHPILL
+curl -m 5 localhost:1024/DEATHPILL | true
 sleep 5
 rm build/deploy/*.jar
 cp build/libs/pizzaslackbot-*.jar build/deploy/pizzaslackbot.jar
