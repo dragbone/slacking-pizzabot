@@ -38,20 +38,5 @@ jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
-task copyJar(dependsOn: jar, type: Copy) {
-    from jar
-    into 'build/deploy'
-}
-
-task killServer() {
-    doLast {
-        try {
-            new URL("http://localhost:1024/DEATHPILL").text
-            Thread.sleep(1000)
-        } catch (Exception e) {
-        }
-    }
-}
-
-task deploy(dependsOn: [test, copyJar, killServer]) {
+task deploy(dependsOn: [jar, test]) {
 }
