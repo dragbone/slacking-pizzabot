@@ -23,7 +23,7 @@ class PizzaVoteParser {
         val noneList: Set<String> = setOf("none", "null", "{}", "()", "[]", "nada", "never", "nope", ":-(", ":'-(")
     }
 
-    fun mapToDay(day: String): DayOfWeek = dayMap[day.toLowerCase().substring(0, 2)]!!
+    fun mapToDay(day: String): DayOfWeek = dayMap[day.trim().toLowerCase().substring(0, 2)]!!
 
     fun parsePizzaVote(input: String): Set<Vote> {
         if (noneList.contains(input.trim()))
