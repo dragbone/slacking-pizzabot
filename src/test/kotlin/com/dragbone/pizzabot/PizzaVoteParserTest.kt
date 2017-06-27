@@ -77,6 +77,34 @@ class PizzaVoteParserTest {
                 Vote(DayOfWeek.WEDNESDAY, 0.5f),
                 Vote(DayOfWeek.FRIDAY, 1f)),
                 parser.parsePizzaVote("(mo-wed),fr"))
+
+        assertEquals(setOf(
+                Vote(DayOfWeek.MONDAY, 1f),
+                Vote(DayOfWeek.TUESDAY, 1f),
+                Vote(DayOfWeek.WEDNESDAY, 1f),
+                Vote(DayOfWeek.FRIDAY, 1f)),
+                parser.parsePizzaVote("mo - wed, fr"))
+
+        assertEquals(setOf(
+                Vote(DayOfWeek.MONDAY, 0.5f),
+                Vote(DayOfWeek.TUESDAY, 0.5f),
+                Vote(DayOfWeek.WEDNESDAY, 0.5f),
+                Vote(DayOfWeek.FRIDAY, 1f)),
+                parser.parsePizzaVote("(mo - wed), fr"))
+
+        assertEquals(setOf(
+                Vote(DayOfWeek.MONDAY, 1f),
+                Vote(DayOfWeek.TUESDAY, 1f),
+                Vote(DayOfWeek.WEDNESDAY, 1f),
+                Vote(DayOfWeek.FRIDAY, 1f)),
+                parser.parsePizzaVote(" mo - wed , fr"))
+
+        assertEquals(setOf(
+                Vote(DayOfWeek.MONDAY, 0.5f),
+                Vote(DayOfWeek.TUESDAY, 0.5f),
+                Vote(DayOfWeek.WEDNESDAY, 0.5f),
+                Vote(DayOfWeek.FRIDAY, 0.5f)),
+                parser.parsePizzaVote("( mo - wed ), ( fr)"))
     }
 
     @Test(expected = ParseException::class) fun parsePizzaVote_invalidRange() {

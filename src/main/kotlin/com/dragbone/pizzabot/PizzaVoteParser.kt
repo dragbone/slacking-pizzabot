@@ -28,8 +28,11 @@ class PizzaVoteParser {
     fun parsePizzaVote(input: String): Set<Vote> {
         if (noneList.contains(input.trim()))
             return emptySet()
+
+        //remove all superfluous whitespace
+        val cleanInput = input.replace(Regex("\\s*-\\s*"), "-").replace(Regex("\\(\\s*"), "(").replace(Regex("\\s*\\)"), ")")
         // Split on whitespaces and comma and remove all empty sections
-        val sections = input.split(Regex("[\\s,]")).filter { it.length > 0 }
+        val sections = cleanInput.split(Regex("[\\s,]")).filter { it.length > 0 }
         // Map sections to votes
         val votes = sections.flatMap { parsePizzaVoteSection(it) }
         if (votes.groupBy { it.day }.any { it.value.count() > 1 })
