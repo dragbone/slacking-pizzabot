@@ -17,7 +17,10 @@ class PizzaVoteParser {
                 "we" to DayOfWeek.WEDNESDAY,
                 "do" to DayOfWeek.THURSDAY,
                 "th" to DayOfWeek.THURSDAY,
-                "fr" to DayOfWeek.FRIDAY
+                "fr" to DayOfWeek.FRIDAY,
+                "sa" to DayOfWeek.SATURDAY,
+                "so" to DayOfWeek.SUNDAY,
+                "su" to DayOfWeek.SUNDAY
         )
 
         val noneList: Set<String> = setOf("none", "null", "{}", "()", "[]", "nada", "never", "nope", ":-(", ":'-(")

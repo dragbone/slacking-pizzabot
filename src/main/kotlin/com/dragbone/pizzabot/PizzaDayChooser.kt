@@ -8,7 +8,7 @@ class PizzaDayChooser(private val pizzaVoteState: PizzaVoteState) {
             return null
 
         val rnd = Random(Calendar.getInstance().get(Calendar.DAY_OF_YEAR).toLong())
-        val days = mutableListOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
+        val days = mutableListOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
         val dayRanking = days.associateBy({ it }, { rnd.nextFloat() })
         val bestAvailability = dayAvailability.maxBy { it.value }!!.value
 
