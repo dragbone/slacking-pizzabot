@@ -2,6 +2,7 @@ package com.dragbone.slackbot
 
 import com.dragbone.IDisposeable
 import com.dragbone.choose
+import com.ullink.slack.simpleslackapi.SlackPreparedMessage
 import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener
@@ -70,6 +71,12 @@ class SlackBot(private val session: SlackSession,
 
                 // Send messages
                 session.sendMessage(channel, messages.joinToString("\n"))
+            } catch (ue: IUserException) {
+                val message = SlackPreparedMessage.Builder()
+                        .withMessage(ue.userMessage)
+                        .withLinkNames(true)
+                        .build()
+                session.sendMessage(channel, message)
             } catch (e: Exception) {
                 println("Exception while executing command $commandName: $e")
                 e.printStackTrace()

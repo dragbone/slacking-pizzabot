@@ -2,9 +2,9 @@ package com.dragbone.pizzabot
 
 import com.dragbone.slackbot.ICommand
 import com.dragbone.slackbot.ICronTask
+import com.dragbone.slackbot.IUserException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ullink.slack.simpleslackapi.SlackChannel
-import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.SlackUser
 import java.io.File
 import java.util.*
@@ -39,16 +39,25 @@ class PizzaCommand(val pizzaState: PizzaVoteState) : ICommand {
 }
 
 class VoteCommand(val pizzaState: PizzaVoteState) : ICommand {
+    class VoteException(private val sender: SlackUser) : IUserException() {
+        override val userMessage: String
+            get() = "Sorry @${sender.userName}, I didn't understand you."
+    }
+
     override val name = "vote"
     override val requiresAdmin = false
     override fun execute(args: String, channel: SlackChannel, sender: SlackUser?): Iterable<String> {
         sender!!
-        val votes = PizzaVoteParser().parsePizzaVote(args)
+        val votes = try {
+            PizzaVoteParser().parsePizzaVote(args)
+        } catch (e: Exception) {
+            throw VoteException(sender)
+        }
         pizzaState.vote(sender.id, votes)
 
         val messages = listOf(
-                "Thank you for your vote ${sender.userName}.",
-                "You voted for {${votes.joinToString() { it.day.toPrettyString() }}}."
+                "Thank you for your vote @${sender.userName}.",
+                "You voted for {${votes.joinToString { it.day.toPrettyString() }}}."
         )
 
         saveState(pizzaState)
