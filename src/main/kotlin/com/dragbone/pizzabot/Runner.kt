@@ -2,13 +2,12 @@ package com.dragbone.pizzabot
 
 import com.dragbone.IDisposeable
 import com.dragbone.slackbot.ICommand
+import com.dragbone.slackbot.Props
 import com.dragbone.slackbot.SlackBot
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ullink.slack.simpleslackapi.SlackSession
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 fun main(args: Array<String>) {
     // Deploy test
@@ -51,7 +50,7 @@ class BotSession : IDisposeable {
         session.addMessagePostedListener(bot)
 
         val ch = session.channels.single { it.name == channel }
-        session.sendMessage(ch, "I HAVE BEEN REBORN! (deployed on ${SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(Date())})")
+        session.sendMessage(ch, "I HAVE BEEN REBORN! (revision:${Props()[Props.Values.Revision]})")
     }
 
     private fun commands(): List<ICommand> {

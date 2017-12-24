@@ -1,5 +1,6 @@
 ### Project
 *.json
+version.properties
 
 ### General
 # Package Files #
