@@ -3,11 +3,6 @@ package com.dragbone.pizzabot
 import java.text.ParseException
 
 class PizzaVoteParser {
-
-    init {
-        println("init")
-    }
-
     companion object {
         private val dayMap: Map<String, DayOfWeek> = mapOf(
                 "mo" to DayOfWeek.MONDAY,

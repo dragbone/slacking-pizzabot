@@ -1,8 +1,7 @@
 package com.dragbone.pizzabot
 
-import org.junit.Test
-
 import org.junit.Assert.*
+import org.junit.Test
 import java.text.ParseException
 
 class PizzaVoteParserTest {
@@ -31,6 +30,16 @@ class PizzaVoteParserTest {
         assertEquals(DayOfWeek.FRIDAY, parser.mapToDay("friday"))
         assertEquals(DayOfWeek.FRIDAY, parser.mapToDay("Fr"))
         assertEquals(DayOfWeek.FRIDAY, parser.mapToDay("fri"))
+
+        assertEquals(DayOfWeek.SATURDAY, parser.mapToDay("Samstag"))
+        assertEquals(DayOfWeek.SATURDAY, parser.mapToDay("Saturday"))
+        assertEquals(DayOfWeek.SATURDAY, parser.mapToDay("Sa"))
+        assertEquals(DayOfWeek.SATURDAY, parser.mapToDay("sam"))
+
+        assertEquals(DayOfWeek.SUNDAY, parser.mapToDay("Sonntag"))
+        assertEquals(DayOfWeek.SUNDAY, parser.mapToDay("Sunday"))
+        assertEquals(DayOfWeek.SUNDAY, parser.mapToDay("So"))
+        assertEquals(DayOfWeek.SUNDAY, parser.mapToDay("su"))
     }
 
     @Test fun getNoneList() {
@@ -105,6 +114,13 @@ class PizzaVoteParserTest {
                 Vote(DayOfWeek.WEDNESDAY, 0.5f),
                 Vote(DayOfWeek.FRIDAY, 0.5f)),
                 parser.parsePizzaVote("( mo - wed ), ( fr)"))
+
+        // Chris did nothing wrong
+        assertEquals(setOf(
+                Vote(DayOfWeek.WEDNESDAY, 1f),
+                Vote(DayOfWeek.THURSDAY, 1f),
+                Vote(DayOfWeek.FRIDAY, 1f)),
+                parser.parsePizzaVote("Mi, do, fr"))
     }
 
     @Test(expected = ParseException::class) fun parsePizzaVote_invalidRange() {
